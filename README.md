@@ -5,4 +5,5 @@ Collaboration between:
 Julie Hjelle Dahl
 Anjan Sarker
 Georg Skuggedal
-Andre Storhaug
+André Storhaug
+Trond Vatten
