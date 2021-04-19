@@ -1,7 +1,7 @@
 # HospiTalkie
 Semester project for TTM4115 at NTNU. 
 
-![Screenshot_4](https://user-images.githubusercontent.com/55386744/115213088-7a127000-a101-11eb-89c6-2163a84e857c.png)
+![Screenshot_5](https://user-images.githubusercontent.com/55386744/115213128-84cd0500-a101-11eb-93ea-ef582e33a57f.png)
 
 
 Collaboration between:
