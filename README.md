@@ -10,3 +10,11 @@ Anjan Sarker
 Georg Skuggedal
 André Storhaug
 Trond Vatten
+
+
+
+## Requirements
+### Client
+```
+Install pyaudio
+```
