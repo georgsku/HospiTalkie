@@ -4,6 +4,7 @@ import logging
 from threading import Thread
 import json
 from appJar import gui
+import mqttCommunication as mqtt_com
 
 MQTT_BROKER = 'mqtt.item.ntnu.no'
 MQTT_PORT = 1883

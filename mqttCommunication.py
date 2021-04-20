@@ -74,7 +74,7 @@ class ClientManagerComponent:
         Processes incoming MQTT messages.
 
         We assume the payload of all received MQTT messages is an UTF-8 encoded
-        string, which is formatted as a JSON object. The JSON object contains
+        string, which is formatted as a JSON object. Th-e JSON object contains
         a field called `command` which identifies what the message should achieve.
 
         As a reaction to a received message, we can for example do the following:

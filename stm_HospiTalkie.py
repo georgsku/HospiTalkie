@@ -2,15 +2,15 @@
 
 from stmpy import Machine, Driver
 
-import ipywidgets as widgets
-from IPython.display import display
+#Imports for Jupyter
+#import ipywidgets as widgets
+#from IPython.display import display
 
 
 #All the Functions can be here
 class HospiTalkie:
     def __init__(self):
         #Do something
-        
         
     def getPhoneBook(self):
         #Do something
@@ -105,12 +105,27 @@ t_recording_idle_t = {'trigger':'t',
 authorize = {'name': 'authorize',
              'entry': 'authenticate(); start_timer("t", 1000)',
              'exit': 'stop_timer("t")'}
-idle = 
-dontDisturb = 
-chooseRecipient = 
-startRecording = 
-recording = 
-sendMessage = 
+
+idle = {'name': 'idle',
+        'entry': 'display(main_screen)'}
+
+dontDisturb = {'name': 'dontDisturb',
+               'entry': 'mute()',
+               'exit': 'unmute()'}
+
+chooseRecipient = {'name': 'chooseRecipient',
+                   'entry': 'display(Contacts)'}
+
+startRecording = {'name': 'startRecording',
+                   'entry': 'display("press btn to record a message to", "chosenReciever")'}
+# TODO: Need to check startRecording entry point - specially with display function parameters
+
+recording = {'name': 'recording',
+             'entry': 'startRecording; display("Recording")'}
+
+sendMessage = {'name': 'sendMessage',
+               'entry': 'sendMessage(); start_timer("t", 1000)'',
+               'exit': 'stop_timer("t")'}
 
 savedMessage = 
 showMessage = 
