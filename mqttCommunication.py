@@ -14,30 +14,49 @@ MQTT_TOPIC_INPUT = 'ttm4115/team_3/hospitalkie/input'
 MQTT_TOPIC_PHONEBOOK = 'ttm4115/team_3/phonebook'
 
 
-class ClientLogic:
+class HospiTalkie:
     """
     State Machine for a named HospiTalkie
     """
+    
+    def on_message(self, client, userdata, msg):
+            try:
+                payload = json.loads(msg.payload.decode("utf-8"))
+            except Exception as err:
+                self._logger.error('Message sent to topic {} had no valid JSON. Message ignored. {}'.format(msg.topic, err))
+                return
+            command = payload.get('command')
+            name = payload.get('name')
+            #something
+
     def __init__(self, name, component):
-        self._logger = logging.getLogger(__name__)
+        
+        #create new mqtt client
+        self.mqtt_client = mqtt.Client()
+        
+        #callback methods
+        self.mqtt_client.on_message = self.on_message
+        
+        # Connect to the broker
+        self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
+
+        # subscribe to own topic
+        self.ownTopic = MQTT_TOPIC_HOSPITALKIE + '/' + name
+        self.mqtt_client.subscribe(self.ownTopic)
+
+        # start the internal loop to process MQTT messages
+        self.mqtt_client.loop_start()
+        
         self.name = name
         self.component = component
-        self.ownTopic = MQTT_TOPIC_HOSPITALKIE + '/' + name
-        self.component.mqtt_client.subscribe(self.ownTopic)
-        self.phoneBook = getPhonebook()
-
-        def getPhonebook():
-            return self.component.stm_driver.stms
-
+        self.currentRecipient = None
 
         def setRecipient(topic):
-            #maybe need to convert topic to topic format
-
+            #maybe need to convert topic from json if not done in GUI
             self.currentRecipient = topic
 
         def sendMessage(message):
-            #maybe need to convert message to json 
-
+            #maybe need to convert message to json if not done in GUI
             self.component.mqtt_client.publish(self.currentRecipient, message)
 
 
@@ -47,101 +66,63 @@ class ClientLogic:
         # the states:
         
 
-        self.stm = stmpy.Machine(name=self.name, transitions=[t0, t1, t2], obj=self, states=[active, completed])
-        self.component.stm_driver.add_machine(self.stm)
 
         
         
 
 
-class ClientManagerComponent:
+class HospiTalkieManager:
     """
     The component to manage named HospiTalkies.
+    
+    Does 4 things:
 
-    This component connects to an MQTT broker and listens to commands.
-    To interact with the component, do the following:
+        1. Creates a driver when initialized
+        2. Creates new a new HospiTalkie instance when receiving a certain message
+        3. Holds list over connected HospiTalkies
+        4. Removes HospiTalkie from list and broadcasts that a HospiTalkie is disconnected (could be done with last-will another place?)
 
-    * Connect to the same broker as the component.
 
     """
 
     def on_connect(self, client, userdata, flags, rc):
         # we just log that we are connected
         self._logger.debug('MQTT connected to {}'.format(client))
+        
+        
 
     def on_message(self, client, userdata, msg):
-        """
-        Processes incoming MQTT messages.
-
-        We assume the payload of all received MQTT messages is an UTF-8 encoded
-        string, which is formatted as a JSON object. Th-e JSON object contains
-        a field called `command` which identifies what the message should achieve.
-
-        As a reaction to a received message, we can for example do the following:
-
-        * create a new state machine instance to handle the incoming messages,
-        * route the message to an existing state machine session,
-        * handle the message right here,
-        * throw the message away.
-
-        """
-        self._logger.debug('Incoming message to topic {}'.format(msg.topic))
-
-        
+                
         try:
             payload = json.loads(msg.payload.decode("utf-8"))
         except Exception as err:
             self._logger.error('Message sent to topic {} had no valid JSON. Message ignored. {}'.format(msg.topic, err))
             return
+
+        #Formatted in the GUI(?) like the timerManager stuff
         command = payload.get('command')
         name = payload.get('name')
         
         print(payload)
         if (command == "new_client"):
-            hospiTalkie = ClientLogic(name, self)
+            hospiTalkie = HospiTalkie(name, self)
+            #This probably should be done with IDs instead of "name". Atleast "name" should be unique
             self.stms.append(name)
 
 
+        # Possibility of doing disconnections: This manager receives message with command "disconnect" and name
+        # the HospiTalkie is removed from list of HospiTalkies and "disconnection" is sent to all HospiTalkies
+        # this should trigger a function in each HospiTalkie which triggers the updatePhonebook function
+        # this probably won't work :)
+        
+        if (command == "disconnect"):
+            self.stms.remove(name)
+            self.component.mqtt_client.publish("disconnection")
+
+
+
     def __init__(self):
-        """
-        Start the component.
-
-        ## Start of MQTT
-        We subscribe to the topic(s) the component listens to.
-        The client is available as variable `self.client` so that subscriptions
-        may also be changed over time if necessary.
-
-        The MQTT client reconnects in case of failures.
-
-        ## State Machine driver
-        We create a single state machine driver for STMPY. This should fit
-        for most components. The driver is available from the variable
-        `self.driver`. You can use it to send signals into specific state
-        machines, for instance.
-
-        """
-        # get the logger object for the component
-        self._logger = logging.getLogger(__name__)
-        print('logging under name {}.'.format(__name__))
-        self._logger.info('Starting Component')
-
-        # create a new MQTT client
-        self._logger.debug('Connecting to MQTT broker {} at port {}'.format(MQTT_BROKER, MQTT_PORT))
-        self.mqtt_client = mqtt.Client()
-
-        # callback methods
-        self.mqtt_client.on_connect = self.on_connect
-        self.mqtt_client.on_message = self.on_message
-
-        # Connect to the broker
-        self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
-
-        # subscribe to input topic
-        self.mqtt_client.subscribe(MQTT_TOPIC_INPUT)
-
-        # start the internal loop to process MQTT messages
-        self.mqtt_client.loop_start()
-
+ 
         # we start the stmpy driver, without any state machines for now
         self.stm_driver = stmpy.Driver()
         self.stm_driver.start(keep_active=True)
@@ -159,21 +140,6 @@ class ClientManagerComponent:
 
         # stop the state machine Driver
         self.stm_driver.stop()
-
-
-# logging.DEBUG: Most fine-grained logging, printing everything
-# logging.INFO:  Only the most important informational log items
-# logging.WARN:  Show only warnings and errors.
-# logging.ERROR: Show only error messages.
-
-debug_level = logging.DEBUG
-logger = logging.getLogger(__name__)
-logger.setLevel(debug_level)
-ch = logging.StreamHandler()
-ch.setLevel(debug_level)
-formatter = logging.Formatter('%(asctime)s - %(name)-12s - %(levelname)-8s - %(message)s')
-ch.setFormatter(formatter)
-logger.addHandler(ch)
 
 
 t = ClientManagerComponent()
