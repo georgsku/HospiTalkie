@@ -124,7 +124,7 @@ recording = {'name': 'recording',
              'entry': 'startRecording; display("Recording")'}
 
 sendMessage = {'name': 'sendMessage',
-               'entry': 'sendMessage(); start_timer("t", 1000)'',
+               'entry': 'sendMessage(); start_timer("t", 1000)',
                'exit': 'stop_timer("t")'}
 
 savedMessage = 
