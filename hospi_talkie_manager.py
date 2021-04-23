@@ -5,13 +5,8 @@ from threading import Thread
 import json
 from appJar import gui
 
-MQTT_BROKER = 'mqtt.item.ntnu.no'
-MQTT_PORT = 1883
 
-
-MQTT_TOPIC_HOSPITALKIE = 'ttm4115/team_3/hospitalkie'
-MQTT_TOPIC_INPUT = 'ttm4115/team_3/hospitalkie/input'
-MQTT_TOPIC_PHONEBOOK = 'ttm4115/team_3/phonebook'
+ 
 
 class HospiTalkieManager:
     """
@@ -32,6 +27,7 @@ class HospiTalkieManager:
         self._logger.debug('MQTT connected to {}'.format(client))
         
         
+
     def on_message(self, client, userdata, msg):
                 
         try:
@@ -59,22 +55,10 @@ class HospiTalkieManager:
         if (command == "disconnect"):
             self.stms.remove(name)
             self.component.mqtt_client.publish("disconnection")
-
+            
 
     def __init__(self):
-        
-        #create new mqtt client
-        self.mqtt_client = mqtt.Client()
-        
-        #callback methods
-        self.mqtt_client.on_message = self.on_message
-        
-        # Connect to the broker
-        self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
-
-        # start the internal loop to process MQTT messages
-        self.mqtt_client.loop_start()
-
+ 
         # we start the stmpy driver, without any state machines for now
         self.stm_driver = stmpy.Driver()
         self.stm_driver.start(keep_active=True)
