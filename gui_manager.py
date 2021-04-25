@@ -7,8 +7,6 @@ import json
 
 "call funtion with: self.create_gui()"
 
-message_received = False
-
 def create_gui(self):
     self.app = gui("HospiTalkie", "300x500")
     self.app.setFont(16)
@@ -20,17 +18,24 @@ def create_gui(self):
 
     def extract_button(label):
         label = label.lower()
-        if 'go' in label: return 'go'
-        if 'back' in label: return 'back'
-        if 'scroll' in label: return 'scroll'
+        if 'go' in label: return 'goBtnPressed'
+        if 'back' in label: return 'backBtnPressed'
+        if 'scroll' in label: return 'scrollBtnScrolled'
         return None
 
     "logic in stm"
     def on_button_pressed(title):
         button = extract_button(title)
-        return button
-        print("pressed")
 
+        "send which button is pressed to the state machine"
+        self.stm.send(button)
+        return button
+
+    "implement function in hospietalkie and call when incoming message arrives" 
+    def message_received(message):
+        self.app.yesNoBox("messread", "Du har en melding. Vil du lese?", parent=None)
+        self.app.setMessage("mess", ""+message+"")
+        
     self.app.setInPadding([10, 10])
     self.app.addButton('Go ', on_button_pressed)
     self.app.addButton('Back ', on_button_pressed)
@@ -38,11 +43,6 @@ def create_gui(self):
 
     self.app.addHorizontalSeparator(4, 0, 4, colour="white")
     self.app.addMessage("mess", """This is the dislapy field.""")
-
-    "implement function"
-    if message_received:
-        app.yesNoBox("messread", "Du har en melding. Vil du lese?", parent=None)
-        app.setMessage("mess", """You received a message""")
 
     self.app.go()
 
