@@ -6,14 +6,16 @@ from threading import Thread
 import json
 
 "call funtion with: self.create_gui()"
+class GuiManager():
+    
+    print("init GuiManager")
+    
+    app = gui("HospiTalkie", "300x500")
+    app.setFont(16)
+    app.setBg("lightGrey")
 
-def create_gui(self):
-    self.app = gui("HospiTalkie", "300x500")
-    self.app.setFont(16)
-    self.app.setBg("lightGrey")
-
-    self.app.addLabel("title", " HospiTalkie ")
-    self.app.setLabelBg("title", "orange")
+    app.addLabel("title", " HospiTalkie ")
+    app.setLabelBg("title", "orange")
 
 
     def extract_button(label):
@@ -28,7 +30,7 @@ def create_gui(self):
         button = extract_button(title)
 
         "send which button is pressed to the state machine"
-        self.stm.send(button)
+        self.stm_driver.send(button)
         return button
 
     "implement function in hospietalkie and call when incoming message arrives" 
@@ -36,15 +38,13 @@ def create_gui(self):
         self.app.yesNoBox("messread", "Du har en melding. Vil du lese?", parent=None)
         self.app.setMessage("mess", ""+message+"")
         
-    self.app.setInPadding([10, 10])
-    self.app.addButton('Go ', on_button_pressed)
-    self.app.addButton('Back ', on_button_pressed)
-    self.app.addButton('Scroll ', on_button_pressed)
 
-    self.app.addHorizontalSeparator(4, 0, 4, colour="white")
-    self.app.addMessage("mess", """This is the dislapy field.""")
+    app.setInPadding([10, 10])
+    app.addButton('Go ', on_button_pressed)
+    app.addButton('Back ', on_button_pressed)
+    app.addButton('Scroll ', on_button_pressed)
 
-    self.app.go()
+    app.addHorizontalSeparator(4, 0, 4, colour="white")
+    app.addMessage("mess", """This is the dislapy field.""")
 
-"self.create_gui()"
-
+    app.go()
