@@ -48,27 +48,37 @@ class HospiTalkie:
 
     def display(self, text):
         if text == "Contacts":
-            contact = list(self.mqtt_client.phonebook.keys())[self.mqtt_client.phonebook_counter % len(self.mqtt_client.phonebook)]
-            print("Displaying: " + contact)
-            self.mqtt_client.selected_recipient = contact
+            self.login_gui.app.setTitle("Choose Reciever")
+            prevContact = list(self.mqtt_client.phonebook.keys())[(self.mqtt_client.phonebook_counter - 1) % len(self.mqtt_client.phonebook)]
+            self.mqtt_client.selected_recipient = list(self.mqtt_client.phonebook.keys())[self.mqtt_client.phonebook_counter % len(self.mqtt_client.phonebook)]
+            nextContact = list(self.mqtt_client.phonebook.keys())[(self.mqtt_client.phonebook_counter + 1) % len(self.mqtt_client.phonebook)]
+            print("Displaying: " + self.mqtt_client.selected_recipient)
+            contact = prevContact+ "\n" + "--> " + self.mqtt_client.selected_recipient + "\n" + nextContact
             self.login_gui.app.setMessage("mess", ""+contact+"")
-        elif text == "nextContact":
+        elif text == "next_contact":
+            print("heo")
             self.mqtt_client.phonebook_counter += 1
         elif text == "btn_record":
+            self.login_gui.app.setTitle("Record Message")
             self.login_gui.app.setMessage("mess", "Press Go to record a message")
         elif text == "main_screen":
             print("main screen")
-            self.login_gui.app.setMessage("mess", "Welcome, press go btn to enter contacts, and back btn to enter messages")
+            self.login_gui.app.setTitle("Idle")
+            self.login_gui.app.setMessage("mess", "Welcome, press go btn to enter contacts, or back btn to enter messages")
         elif text == "new_messages":
+            self.login_gui.app.setTitle("New Messages")
             self.login_gui.app.setMessage("mess", "You got a new message, would you like to read/hear?")
         elif text == "saved_messages":
+            self.login_gui.app.setTitle("Saved Messages")
             self.login_gui.app.setMessage("mess", "Saved Messages")
         elif text == "reply_message":
+            self.login_gui.app.setTitle("Reply To Message")
             self.login_gui.app.setMessage("mess", "Press go btn to reply back to idle")
             
 
     def mute(self):
         print("mute")
+        self.login_gui.app.setTitle("Do Not Disturb")
         self.login_gui.app.setButton("Mute", "Unmute")
         self.login_gui.app.setMessage("mess", "You will not be disturbed!")
 

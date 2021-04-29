@@ -56,7 +56,7 @@ transitions.append(t_chooseRecipient_idle)
 t_chooseRecipient_chooseRecipient = {'trigger':'scrollBtnScrolled',
                                      'source':'chooseRecipient',
                                      'target':'chooseRecipient',
-                                     'effect': 'display("nextContact")'}
+                                     'effect': 'display("next_contact")'}
 transitions.append(t_chooseRecipient_chooseRecipient)
 
 t_chooseRecipient_startRecording = {'trigger':'goBtnPressed',

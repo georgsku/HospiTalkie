@@ -8,12 +8,14 @@ class LoginGui:
     self.stm_driver = stm_driver
     print("init LoginGui")
     self.app = gui("Login Window", "400x200")
-    self.app.setBg("lightGrey")
+    self.app.setBg("#d8e0bb")
     self.app.setFont(16)
 
+    self.app.startFrame("header", row=0, column=0, rowspan=1, colspan=2)
     self.app.addLabel("title", "Welcome to HospiTalkie")
-    self.app.setLabelBg("title", "blue")
-    self.app.setLabelFg("title", "orange")
+    self.app.setLabelFg("title", "#6b3074")
+    self.app.getLabelWidget("title").config(font=("Sans Serif", "24", "bold"))
+    self.app.stopFrame()
 
     self.app.addLabelEntry("Username")
     self.app.addLabelSecretEntry("Password")
@@ -41,23 +43,42 @@ class LoginGui:
 
     "implement function in hospietalkie and call when incoming message arrives" 
 
-    self.app.setTitle("Idle")
-    self.app.setLabel("title", " HospiTalkie ")
+    
+    
     self.app.removeLabel("Username")
     self.app.removeLabel("Password")
     self.app.removeButton("Submit")
     self.app.removeButton("Cancel")
-    
-    self.app.setSize("300x500")
-    self.app.setInPadding([10, 10])
-    self.app.addButton('Go', on_button_pressed)
-    self.app.addButton('Back', on_button_pressed)
-    self.app.addButton('Scroll', on_button_pressed)
-    self.app.addButton('Mute', on_button_pressed)
+    self.app.removeLabel("title")
 
-    #self.app.addHorizontalSeparator(4, 0, 4, colour="white")
-    self.app.addMessage("mess", "Welcome!")
+    self.app.setSize("300x300")
+    self.app.setStretch("both")
+    self.app.setSticky("")
+
+    self.app.addLabel("title", "Welcome to HospiTalkie", 0, 0, 2, 1)
+    self.app.setLabelFg("title", "#6b3074")
+    self.app.getLabelWidget("title").config(font=("Sans Serif", "24", "bold"))
+
+    self.app.addMessage("mess", "", 1, 0, 2, 1)
+    self.app.getMessageWidget("mess").config(font=("Sans Serif", "16", "italic"))
+    self.app.setMessageFg("mess", "#6b3074")
     self.app.setMessageWidth("mess", "300")
+
+    self.app.addButton('Go', on_button_pressed, 2, 0)
+    self.app.setButtonWidth("Go", "12")
+    self.app.setButtonBg("Go", "#6b3074")
+
+    self.app.addButton('Back', on_button_pressed, 2, 1)
+    self.app.setButtonWidth("Back", "12")
+    self.app.setButtonBg("Back", "#6b3074")
+
+    self.app.addButton('Scroll', on_button_pressed, 3, 0)
+    self.app.setButtonWidth("Scroll", "12")
+    self.app.setButtonBg("Scroll", "#6b3074")
+    
+    self.app.addButton('Mute', on_button_pressed, 3, 1)
+    self.app.setButtonWidth("Mute", "12")
+    self.app.setButtonBg("Mute", "#6b3074")
 
   def press(self, button):
       if button == "Cancel":
