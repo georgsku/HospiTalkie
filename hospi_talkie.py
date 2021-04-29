@@ -1,6 +1,7 @@
 from mqtt_client import MQTTClient
 from login_gui import LoginGui
 
+
 class HospiTalkie:
     """
     State Machine for a named HospiTalkie
@@ -8,18 +9,20 @@ class HospiTalkie:
     TODO: Only include logic for functions defined by the statemachine.
 
     """
-    def start(self, stm_driver):
+    def start(self, stm_driver, login_gui):
         #TODO: get the name of the "person"
         print("init HospiTalkie")
         self.name = "Ola"
         self.stm_driver = stm_driver
+        self.login_gui = login_gui
         self.mqtt_client = MQTTClient(self.name, self.stm_driver)
-        self.login_gui = LoginGui(self.stm_driver)
+        
 
-    def setRecipient(self, topic):
+    def setRecipient(self):
         print("setRecipient HospiTalkie")
         #maybe need to convert topic from json if not done in GUI
-        self.currentRecipient = topic
+        self.currentRecipient = self.mqtt_client.selected_recipient
+        self.currentRecipientTopic = self.mqtt_client.phonebook[self.currentRecipient]
 
     def sendMessage(self, message):
         print("sendMessage HospiTalkie")
@@ -33,8 +36,8 @@ class HospiTalkie:
 
     def loginSuccess(self):
         print("loginSuccess HospiTalkie")
-        print(type(self))
-        dir(self)
+        self.login_gui.switch_gui()
+        
 
     def loginError(self):
         print("loginError HospiTalkie")
@@ -44,19 +47,51 @@ class HospiTalkie:
         print("loadPhoneBook")
 
     def display(self, text):
-        print("Displaying: " + text)
+        if text == "Contacts":
+            contact = list(self.mqtt_client.phonebook.keys())[self.mqtt_client.phonebook_counter % len(self.mqtt_client.phonebook)]
+            print("Displaying: " + contact)
+            self.mqtt_client.selected_recipient = contact
+            self.login_gui.app.setMessage("mess", ""+contact+"")
+        elif text == "nextContact":
+            self.mqtt_client.phonebook_counter += 1
+        elif text == "btn_record":
+            self.login_gui.app.setMessage("mess", "Press Go to record a message")
+        elif text == "main_screen":
+            print("main screen")
+            self.login_gui.app.setMessage("mess", "Welcome, press go btn to enter contacts, and back btn to enter messages")
+        elif text == "new_messages":
+            self.login_gui.app.setMessage("mess", "You got a new message, would you like to read/hear?")
+        elif text == "saved_messages":
+            self.login_gui.app.setMessage("mess", "Saved Messages")
+        elif text == "reply_message":
+            self.login_gui.app.setMessage("mess", "Press go btn to reply back to idle")
+            
 
     def mute(self):
         print("mute")
+        self.login_gui.app.setMessage("mess", "You will not be disturbed!")
+
 
     def unmute(self):
         print("unmute")
+        self.login_gui.app.setButton("Mute", "Unmute")
 
     def highlightNextMessage(self):
         print("highlightNextMessage")
         
     def storeMessage(self):
         print("storeMessage")
+
+    def getMessage(self, message):
+        print("Get Message")
+        self.message = message
+
+    def storeMessages(self):
+        print("Store message")
+
+    def playMessage(self):
+        print("Play message")
+        self.login_gui.app.setMessage("mess", self.message)
 
     def startRecording(self):
         print("Start Recording")

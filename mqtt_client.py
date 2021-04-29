@@ -1,10 +1,11 @@
 import paho.mqtt.client as mqtt
+import json
 
 MQTT_BROKER = '78.156.8.124'
 MQTT_PORT = 1883
 
-MQTT_TOPIC_HOSPITALKIE = 'ttm4115/team_3/hospitalkie'
-MQTT_TOPIC_INPUT = 'ttm4115/team_3/hospitalkie/input'
+MQTT_TOPIC_HOSPITALKIE = 'hospitalkie'
+MQTT_TOPIC_INPUT = 'input'
 MQTT_PHONEBOOK = 'phonebook/'
 MQTT_STATUS = 'status/'
 
@@ -14,6 +15,9 @@ class MQTTClient:
         print("init MqttClient")
         self.name = name
         self.stm_driver = stm_driver
+        self.phonebook = {"George": "george", "Julie": "Julie", "Trond": "Trond", "Anjan": "Anjan"}
+        self.phonebook_counter = 0
+        self.selected_recipient = None
 
         #create new mqtt client
         self.mqtt_client = mqtt.Client()
@@ -46,10 +50,17 @@ class MQTTClient:
     def on_message(self, client, userdata, msg):
         print("Got a new message")
         if msg.topic == MQTT_PHONEBOOK + self.name:
-            phonebook = str(msg.payload.decode("utf-8"))
-            print(phonebook)
+            try:
+                message = msg.payload.decode("utf-8")
+                message = message.replace("\'", "\"")
+                print(message)
+                self.phonebook = json.loads(message)
+                print("Phonebook: " , self.phonebook)
+            except:
+                print("wops")
         else:
             message = str(msg.payload.decode("utf-8"))
+            self.stm_driver.send("messageReceived", "HospiTalkie", args=[message])
             print(message)
 
 

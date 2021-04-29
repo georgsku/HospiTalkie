@@ -11,25 +11,25 @@ transitions = []
 #Transitions - Initial
 
 t_initial_login = {'source': 'initial',
-                       'target': 'login',}
+                   'target': 'login',}
 transitions.append(t_initial_login)
 
 t_login_authorize = {'trigger': 'error',
-                         'source': 'login',
-                         'target': 'login',
-                         'effect': 'loginError'}
+                     'source': 'login',
+                     'target': 'login',
+                     'effect': 'loginError'}
 transitions.append(t_login_authorize)
 
 t_login_idle = {'trigger': 'loginSuccess',
-                    'source': 'login',
-                    'target': 'idle',
-                    'effect':'loginSuccess',}
+                'source': 'login',
+                'target': 'idle',
+                'effect':'loginSuccess',}
 transitions.append(t_login_idle)
 
 
 #Transitions - Do Not Disturb
 
-t_idle_dontDisturb = {'trigger':'goBtnHold',
+t_idle_dontDisturb = {'trigger':'goBtnHold',    #TODO: Need to fix this trigger since we have a mute button now
                       'source':'idle',
                       'target':'dontDisturb'}
 transitions.append(t_idle_dontDisturb)
@@ -62,7 +62,7 @@ transitions.append(t_chooseRecipient_chooseRecipient)
 t_chooseRecipient_startRecording = {'trigger':'goBtnPressed',
                                     'source':'chooseRecipient',
                                     'target':'startRecording',
-                                    'effect': 'setRecipient'}
+                                    'effect': 'setRecipient()'}
 transitions.append(t_chooseRecipient_startRecording)
 
 t_startRecording_recording = {'trigger':'goBtnPressed',
@@ -70,16 +70,21 @@ t_startRecording_recording = {'trigger':'goBtnPressed',
                               'target':'recording'}
 transitions.append(t_startRecording_recording)
 
-t_recording_sendMessage = {'trigger':'goBtnReleased',
+t_startRecording_idle = {'trigger':'backBtnPressed',
+                         'source':'startRecording',
+                         'target':'idle'}
+transitions.append(t_startRecording_idle)
+
+t_recording_sendMessage = {'trigger':'goBtnPressed',    #
                            'source':'recording',
                            'target':'sendMessage',
                            'effect':'stopRecording'} #May be we can change it to exit?
 transitions.append(t_recording_sendMessage)
 
 t_recording_idle = {'trigger':'messagePublished',
-                      'source':'recording',
-                      'target':'idle',
-                      'effect': 'display("Message sent")'}
+                    'source':'recording',
+                    'target':'idle',
+                    'effect': 'display("Message sent")'}
 transitions.append(t_recording_idle)
 
 t_recording_idle_t = {'trigger':'t',
@@ -93,7 +98,8 @@ transitions.append(t_recording_idle_t)
 
 t_idle_showMessages = {'trigger':'messageReceived',
                        'source':'idle',
-                       'target':'showMessages'}
+                       'target':'showMessages',
+                        'effect': 'getMessage(*)'}
 transitions.append(t_idle_showMessages)
 
 t_showMessages_idle = {'trigger':'backBtnPressed',
@@ -102,20 +108,48 @@ t_showMessages_idle = {'trigger':'backBtnPressed',
                        'effect': 'storeMessages()'}
 transitions.append(t_showMessages_idle)
 
-t_showMessages_playMessages = {'trigger':'goBtnPressed',
+t_showMessages_playMessage = {'trigger':'goBtnPressed',
                                'source':'showMessages',
-                               'target':'playMessages'}
-transitions.append(t_showMessages_playMessages)
+                               'target':'playMessage'}
+transitions.append(t_showMessages_playMessage)
 
-""" t_playMessages_reply
-t_reply_idle
+
+t_playMessage_reply = {'trigger':'goBtnPressed',
+                        'source':'playMessage',        # TODO: May need to add trigger
+                        'target':'reply'}
+transitions.append(t_playMessage_reply)
+
+t_reply_idle = {'trigger':'backBtnPressed',
+                'source':'reply',
+                'target':'idle'}
+transitions.append(t_reply_idle)                   
+
+t_reply_startRecording = {'trigger':'goBtnPressed',
+                          'source':'reply',
+                          'target':'startRecording'}
+transitions.append(t_reply_startRecording)
 
 #Transitions - Saved Message
 
-t_idle_savedMessages
-t_savedMessages_savedMessages
-t_savedMessages_playMessages
- """
+t_idle_savedMessages = {'trigger':'backBtnPressed',
+                        'source':'idle',
+                        'target':'savedMessages'}
+transitions.append(t_idle_savedMessages)
+
+
+t_savedMessages_savedMessages = {'trigger':'scrollBtnScrolled',
+                                 'source':'savedMessages',
+                                 'target':'savedMessages',
+                                 'effect': 'highlightNextMessage()'}
+transitions.append(t_savedMessages_savedMessages)
+
+
+t_savedMessages_playMessage = {'trigger':'backBtnPressed',
+                                'source':'savedMessages',
+                                'target':'idle'}
+transitions.append(t_savedMessages_playMessage)
+
+
 ##########################################
 #    States
 ##########################################
@@ -140,9 +174,9 @@ chooseRecipient = {'name': 'chooseRecipient',
 states.append(chooseRecipient)
 
 startRecording = {'name': 'startRecording',
-                   'entry': 'display("press btn to record a message to", "chosenReciever")'}
+                   'entry': 'display("btn_record")'}
 states.append(startRecording)
-# TODO: Need to check startRecording entry point - specially with display function parameters
+# TODO: Need to check startRecording entry point - specially with may function parameters
 
 recording = {'name': 'recording',
              'entry': 'startRecording; display("Recording")'}
@@ -153,13 +187,18 @@ sendMessage = {'name': 'sendMessage',
                'exit': 'stop_timer("t")'}
 states.append(sendMessage)
 
+savedMessages = {'name': 'savedMessages',
+               'entry': 'display("saved_messages")'}
+states.append(savedMessages)
 
+showMessages = {'name': 'showMessages',
+               'entry': 'display("new_messages")'}
+states.append(showMessages)
 
-savedMessage = {}
-showMessage = {}
-playMessage = {}
-reply = {}
+playMessage = {'name': 'playMessage',
+               'entry': 'playMessage()'}
+states.append(playMessage)
 
-
-
-
+reply = {'name': 'reply',
+         'entry': 'display("reply_message")'}
+states.append(reply)

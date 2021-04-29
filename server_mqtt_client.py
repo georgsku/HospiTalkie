@@ -8,9 +8,7 @@ MQTT_TOPIC_HOSPITALKIE = 'ttm4115/team_3/hospitalkie'
 MQTT_STATUS = 'status/'
 MQTT_PHONEBOOK = 'phonebook/'
 
-phonebook = {
-    "server": "status/#"
-}
+phonebook = {"George": "george", "Julie": "Julie", "Trond": "Trond", "Anjan": "Anjan"}
 
 
 
@@ -52,7 +50,7 @@ class serverMQTTClient:
         elif topic == "phonebook":
             if message == "getPhonebook":
                 print("Sending phonebook to: ", name)
-                client.publish(MQTT_PHONEBOOK + name, str(phonebook), qos=0, retain=True)        
+                client.publish(MQTT_PHONEBOOK + name, json.dumps(phonebook), qos=0, retain=True)        
         
         
 

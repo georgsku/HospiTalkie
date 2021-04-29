@@ -8,15 +8,25 @@ import json
 "call funtion with: self.create_gui()"
 class GuiManager():
     
-    print("init GuiManager")
-    
-    app = gui("HospiTalkie", "300x500")
-    app.setFont(16)
-    app.setBg("lightGrey")
 
-    app.addLabel("title", " HospiTalkie ")
-    app.setLabelBg("title", "orange")
+    def __init__(self):
+        print("init GuiManager")
+        
+        app = gui("HospiTalkie", "300x500")
+        app.setFont(16)
+        app.setBg("lightGrey")
 
+        app.addLabel("title", " HospiTalkie ")
+        app.setLabelBg("title", "orange")
+        app.setInPadding([10, 10])
+        app.addButton('Go ', on_button_pressed)
+        app.addButton('Back ', on_button_pressed)
+        app.addButton('Scroll ', on_button_pressed)
+
+        app.addHorizontalSeparator(4, 0, 4, colour="white")
+        app.addMessage("mess", """This is the dislapy field.""")
+
+        app.go()
 
     def extract_button(label):
         label = label.lower()
@@ -39,12 +49,3 @@ class GuiManager():
         self.app.setMessage("mess", ""+message+"")
         
 
-    app.setInPadding([10, 10])
-    app.addButton('Go ', on_button_pressed)
-    app.addButton('Back ', on_button_pressed)
-    app.addButton('Scroll ', on_button_pressed)
-
-    app.addHorizontalSeparator(4, 0, 4, colour="white")
-    app.addMessage("mess", """This is the dislapy field.""")
-
-    app.go()
