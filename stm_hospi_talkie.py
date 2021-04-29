@@ -29,12 +29,12 @@ transitions.append(t_login_idle)
 
 #Transitions - Do Not Disturb
 
-t_idle_dontDisturb = {'trigger':'goBtnHold',    #TODO: Need to fix this trigger since we have a mute button now
+t_idle_dontDisturb = {'trigger':'muteBtnPressed',    #TODO: Need to fix this trigger since we have a mute button now
                       'source':'idle',
                       'target':'dontDisturb'}
 transitions.append(t_idle_dontDisturb)
 
-t_dontDisturb_idle = {'trigger':'backBtnPressed',
+t_dontDisturb_idle = {'trigger':'muteBtnPressed',
                       'source':'dontDisturb',
                       'target':'idle'}
 transitions.append(t_dontDisturb_idle)

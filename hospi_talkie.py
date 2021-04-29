@@ -69,12 +69,14 @@ class HospiTalkie:
 
     def mute(self):
         print("mute")
+        self.login_gui.app.setButton("Mute", "Unmute")
         self.login_gui.app.setMessage("mess", "You will not be disturbed!")
 
 
     def unmute(self):
         print("unmute")
-        self.login_gui.app.setButton("Mute", "Unmute")
+        self.login_gui.app.setButton("Mute", "Mute")
+        
 
     def highlightNextMessage(self):
         print("highlightNextMessage")

@@ -53,7 +53,6 @@ class MQTTClient:
             try:
                 message = msg.payload.decode("utf-8")
                 message = message.replace("\'", "\"")
-                print(message)
                 self.phonebook = json.loads(message)
                 print("Phonebook: " , self.phonebook)
             except:

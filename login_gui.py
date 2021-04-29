@@ -28,7 +28,7 @@ class LoginGui:
         if 'go' in label: return 'goBtnPressed'
         if 'back' in label: return 'backBtnPressed'
         if 'scroll' in label: return 'scrollBtnScrolled'
-        if 'mute' in label: return 'goBtnHold'
+        if 'mute' in label: return 'muteBtnPressed'
         return None
 
     "logic in stm"
@@ -41,21 +41,19 @@ class LoginGui:
 
     "implement function in hospietalkie and call when incoming message arrives" 
 
-    
-    self.app.removeLabel("title")
+    self.app.setTitle("Idle")
+    self.app.setLabel("title", " HospiTalkie ")
     self.app.removeLabel("Username")
     self.app.removeLabel("Password")
     self.app.removeButton("Submit")
     self.app.removeButton("Cancel")
     
     self.app.setSize("300x500")
-    self.app.addLabel("title", " HospiTalkie ")
-    self.app.setLabelBg("title", "orange")
     self.app.setInPadding([10, 10])
-    self.app.addButton('Go ', on_button_pressed)
-    self.app.addButton('Back ', on_button_pressed)
-    self.app.addButton('Scroll ', on_button_pressed)
-    self.app.addButton('Mute ', on_button_pressed)
+    self.app.addButton('Go', on_button_pressed)
+    self.app.addButton('Back', on_button_pressed)
+    self.app.addButton('Scroll', on_button_pressed)
+    self.app.addButton('Mute', on_button_pressed)
 
     #self.app.addHorizontalSeparator(4, 0, 4, colour="white")
     self.app.addMessage("mess", "Welcome!")
