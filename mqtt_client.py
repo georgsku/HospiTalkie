@@ -58,9 +58,11 @@ class MQTTClient:
             except:
                 print("wops")
         else:
-            message = str(msg.payload.decode("utf-8"))
+            #message = str(msg.payload.decode("utf-8"))
+            message = msg.payload #Audio in binary
+            print("OMG IT WORKS")
             self.stm_driver.send("messageReceived", "HospiTalkie", args=[message])
-            print(message)
+            #TODO: Need to know who the sender was.....
 
 
     def on_connect(self, client, userdata, flags, rc):
@@ -74,6 +76,9 @@ class MQTTClient:
             self.stm_driver.send("loginError", "HospiTalkie")
 
 
+    def publish(self, recipient, message):
+        reciever = MQTT_TOPIC_HOSPITALKIE + '/' + recipient
+        self.mqtt_client.publish(reciever, message)
           
     def on_disconnect(self, client, userdata, flags):
         client.publish(MQTT_STATUS + self.name, 0, qos=0, retain=True)

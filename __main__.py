@@ -9,7 +9,7 @@ driver = Driver()
 login_gui = LoginGui(driver)
 
 hospiTalkie = HospiTalkie()
-machine  = Machine(transitions=transitions, obj=hospiTalkie, name="HospiTalkie", states=states)
+machine = Machine(transitions=transitions, obj=hospiTalkie, name="HospiTalkie", states=states)
 driver.add_machine(machine)
 #hospiTalkie.stm = machine
 

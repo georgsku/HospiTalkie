@@ -1,10 +1,14 @@
 from appJar import gui
 from gui_manager import GuiManager
-
+from strings import get_string
 class LoginGui:
   
 
   def __init__(self, stm_driver):
+    import threading
+    print("thread gui: ")
+    print(threading.current_thread())
+
     self.stm_driver = stm_driver
     print("init LoginGui")
     self.app = gui("Login Window", "400x200")
@@ -36,10 +40,10 @@ class LoginGui:
     "logic in stm"
     def on_button_pressed(title):
         button = extract_button(title)
-        print("btn pressed")
+        print("btn pressed" + title)
 
         "send which button is pressed to the state machine"
-        self.stm_driver.send(button, "HospiTalkie")
+        self.stm_driver.send(button, get_string("hospi_talkie"))
 
     "implement function in hospietalkie and call when incoming message arrives" 
 
@@ -91,17 +95,15 @@ class LoginGui:
 
   def login_error(self):
     print("login error")
-    self.app.infoBox("Wrong Username or Password", "Please type your username or password again ", parent=None)
+    self.app.infoBox(get_string("wrong_user_pass"), get_string("retype_user_pass"), parent=None)
 
   def message_received(self, message):
     print("hei og ho")
-    self.app.yesNoBox("messread", "Du har en melding. Vil du lese?", parent=None)
-    self.app.setMessage("mess", ""+message+"")
+    self.app.yesNoBox("messread", get_string("new_message"), parent=None)
+    self.app.setMessage("mess", str(message))
 
   def login_success(self):
     print("loginSucess")
     self.app.stop()
     self.myGUi = GuiManager()
     self.myGUi.stm_driver = self.stm_driver
-
-      

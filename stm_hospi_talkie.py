@@ -75,20 +75,26 @@ t_startRecording_idle = {'trigger':'backBtnPressed',
                          'target':'idle'}
 transitions.append(t_startRecording_idle)
 
-t_recording_sendMessage = {'trigger':'goBtnPressed',    #
+t_recording_doneRecording = {'trigger':'goBtnPressed',
                            'source':'recording',
+                           'target':'doneRecording',
+                           'effect':'stopRecording'} 
+transitions.append(t_recording_doneRecording)
+
+t_recording_sendMessage = {'trigger':'recordingFinished',
+                           'source':'doneRecording',
                            'target':'sendMessage',
-                           'effect':'stopRecording'} #May be we can change it to exit?
+                           'effect': 'sendMessage(*)'}
 transitions.append(t_recording_sendMessage)
 
 t_recording_idle = {'trigger':'messagePublished',
-                    'source':'recording',
+                    'source':'sendMessage',
                     'target':'idle',
                     'effect': 'display("Message sent")'}
 transitions.append(t_recording_idle)
 
 t_recording_idle_t = {'trigger':'t',
-                      'source':'recording',
+                      'source':'sendMessage',
                       'target':'idle',
                       'effect': 'display("Message not sent")'}
 transitions.append(t_recording_idle_t)
@@ -176,14 +182,19 @@ states.append(chooseRecipient)
 startRecording = {'name': 'startRecording',
                    'entry': 'display("btn_record")'}
 states.append(startRecording)
+
 # TODO: Need to check startRecording entry point - specially with may function parameters
 
 recording = {'name': 'recording',
              'entry': 'startRecording; display("Recording")'}
 states.append(recording)
 
+doneRecording = {'name': 'doneRecording',
+                 'entry': 'stopRecording; display("done_recording")'}
+states.append(doneRecording)
+
 sendMessage = {'name': 'sendMessage',
-               'entry': 'sendMessage(); start_timer("t", 1000)',
+       #        'entry': 'start_timer("t", 10000)',
                'exit': 'stop_timer("t")'}
 states.append(sendMessage)
 
