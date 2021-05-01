@@ -100,8 +100,6 @@ t_recording_idle_t = {'trigger':'t',
 transitions.append(t_recording_idle_t)
 
 #Transitions - Message Received
-
-
 t_idle_showMessages = {'trigger':'messageReceived',
                        'source':'idle',
                        'target':'showMessages',
@@ -121,7 +119,7 @@ transitions.append(t_showMessages_playMessage)
 
 
 t_playMessage_reply = {'trigger':'goBtnPressed',
-                        'source':'playMessage',        # TODO: May need to add trigger
+                        'source':'playMessage',
                         'target':'reply'}
 transitions.append(t_playMessage_reply)
 
@@ -136,7 +134,6 @@ t_reply_startRecording = {'trigger':'goBtnPressed',
 transitions.append(t_reply_startRecording)
 
 #Transitions - Saved Message
-
 t_idle_savedMessages = {'trigger':'backBtnPressed',
                         'source':'idle',
                         'target':'savedMessages'}
@@ -163,7 +160,7 @@ transitions.append(t_savedMessages_playMessage)
 #States naming convention: s_name
 states= []
 login = {'name': 'login',
-             'submit': 'authenticate(*)',}
+         'submit': 'authenticate(*)',}
 states.append(login)
 
 idle = {'name': 'idle',
@@ -172,44 +169,55 @@ states.append(idle)
 
 dontDisturb = {'name': 'dontDisturb',
                'entry': 'mute()',
+               'messageReceived': 'defer',
                'exit': 'unmute()'}
 states.append(dontDisturb)
 
 chooseRecipient = {'name': 'chooseRecipient',
-                   'entry': 'display("Contacts")'}
+                   'entry': 'display("Contacts")',
+                   'messageReceived': 'defer'}
 states.append(chooseRecipient)
 
 startRecording = {'name': 'startRecording',
-                   'entry': 'display("btn_record")'}
+                  'entry': 'display("btn_record")',
+                  'messageReceived': 'defer'}
 states.append(startRecording)
 
 # TODO: Need to check startRecording entry point - specially with may function parameters
 
 recording = {'name': 'recording',
-             'entry': 'startRecording; display("Recording")'}
+             'entry': 'startRecording; display("Recording")',
+             'messageReceived': 'defer'}
 states.append(recording)
 
 doneRecording = {'name': 'doneRecording',
-                 'entry': 'stopRecording; display("done_recording")'}
+                 'entry': 'stopRecording; display("done_recording")',
+                 'messageReceived': 'defer'}
 states.append(doneRecording)
 
 sendMessage = {'name': 'sendMessage',
        #        'entry': 'start_timer("t", 10000)',
+               'messageReceived': 'defer',
                'exit': 'stop_timer("t")'}
 states.append(sendMessage)
 
+#States - Saved Messages
 savedMessages = {'name': 'savedMessages',
-               'entry': 'display("saved_messages")'}
+                 'entry': 'display("saved_messages")',
+                 'messageReceived': 'defer'}
 states.append(savedMessages)
 
 showMessages = {'name': 'showMessages',
-               'entry': 'display("new_messages")'}
+                'entry': 'display("new_messages")',
+                'messageReceived': 'defer'}
 states.append(showMessages)
 
 playMessage = {'name': 'playMessage',
-               'entry': 'playMessage()'}
+               'entry': 'playMessage()',
+               'messageReceived': 'defer'}
 states.append(playMessage)
 
 reply = {'name': 'reply',
-         'entry': 'display("reply_message")'}
+         'entry': 'display("reply_message")',
+         'messageReceived': 'defer'}
 states.append(reply)
