@@ -18,16 +18,22 @@ class Player:
         t1 = {'trigger': 'start', 'source': 'ready', 'target': 'playing'}
         t2 = {'trigger': 'done', 'source': 'playing', 'target': 'ready'}
 
-        s_playing = {'name': 'playing', 'do': 'play(*)'}
+        s_playing = {'name': 'playing', 'do': 'play(*)', 'start': 'defer'}
 
         self.stm = Machine(name='player', transitions=[t0, t1, t2], states=[s_playing], obj=self)
         self.stm_driver.add_machine(self.stm)
 
 
-    def play(self, audio):
+    def play(self, audio, isBuffer=False):
         #filename = 'output.wav'
-        file = io.BytesIO(audio)
-
+        print("playing...")
+        
+        file = audio
+        if (isBuffer):
+            print("Is buffer!!!")
+            file = io.BytesIO(audio)
+        else:
+            print("Is NOT buffer!!!")
         # Set chunk size of 1024 samples per data frame
         chunk = 1024  
 
@@ -49,10 +55,13 @@ class Player:
         data = wf.readframes(wf.getnframes())
 
         # Play the sound by writing the audio data to the stream
-        while data != '':
+        while data != b'':
+            print("playing")
             stream.write(data)
             data = wf.readframes(chunk)
 
         # Close and terminate the stream
         stream.close()
         p.terminate()
+        self.stm_driver.send("playingFinished", "HospiTalkie")
+        print("\n Playing finished \n")

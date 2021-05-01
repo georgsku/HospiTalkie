@@ -100,25 +100,27 @@ t_recording_idle_t = {'trigger':'t',
 transitions.append(t_recording_idle_t)
 
 #Transitions - Message Received
-t_idle_showMessages = {'trigger':'messageReceived',
+t_idle_newMessage = {'trigger':'messageReceived',
                        'source':'idle',
-                       'target':'showMessages',
+                       'target':'newMessage',
                         'effect': 'getMessage(*)'}
-transitions.append(t_idle_showMessages)
+transitions.append(t_idle_newMessage)
 
-t_showMessages_idle = {'trigger':'backBtnPressed',
-                       'source':'showMessages',
+#TODO: stop playing in the player state machine by setting variable
+t_newMessage_idle = {'trigger':'backBtnPressed',
+                       'source':'newMessage',
                        'target':'idle',
                        'effect': 'storeMessages()'}
-transitions.append(t_showMessages_idle)
+transitions.append(t_newMessage_idle)
 
-t_showMessages_playMessage = {'trigger':'goBtnPressed',
-                               'source':'showMessages',
+t_newMessage_playMessage = {'trigger':'playingFinished',
+                               'source':'newMessage',
                                'target':'playMessage'}
-transitions.append(t_showMessages_playMessage)
+transitions.append(t_newMessage_playMessage)
 
 
-t_playMessage_reply = {'trigger':'goBtnPressed',
+
+t_playMessage_reply = {'trigger':'playingFinished',
                         'source':'playMessage',
                         'target':'reply'}
 transitions.append(t_playMessage_reply)
@@ -128,10 +130,10 @@ t_reply_idle = {'trigger':'backBtnPressed',
                 'target':'idle'}
 transitions.append(t_reply_idle)                   
 
-t_reply_startRecording = {'trigger':'goBtnPressed',
+t_reply_recording = {'trigger':'goBtnPressed',
                           'source':'reply',
-                          'target':'startRecording'}
-transitions.append(t_reply_startRecording)
+                          'target':'recording'}
+transitions.append(t_reply_recording)
 
 #Transitions - Saved Message
 t_idle_savedMessages = {'trigger':'backBtnPressed',
@@ -186,7 +188,7 @@ states.append(startRecording)
 # TODO: Need to check startRecording entry point - specially with may function parameters
 
 recording = {'name': 'recording',
-             'entry': 'startRecording; display("Recording")',
+             'entry': 'startRecording; display("recording")',
              'messageReceived': 'defer'}
 states.append(recording)
 
@@ -207,13 +209,14 @@ savedMessages = {'name': 'savedMessages',
                  'messageReceived': 'defer'}
 states.append(savedMessages)
 
-showMessages = {'name': 'showMessages',
-                'entry': 'display("new_messages")',
-                'messageReceived': 'defer'}
-states.append(showMessages)
+newMessage = {'name': 'newMessage',
+              'entry': 'display("new_message")',
+              'entry': 'playNotification()',
+              'messageReceived': 'defer'}
+states.append(newMessage)
 
 playMessage = {'name': 'playMessage',
-               'entry': 'playMessage()',
+               'entry': 'playMessage; display("playing")',
                'messageReceived': 'defer'}
 states.append(playMessage)
 

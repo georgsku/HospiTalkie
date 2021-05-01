@@ -29,6 +29,8 @@ class HospiTalkie:
         self.stm_driver = stm_driver
         self.login_gui = login_gui
         self.mqtt_client = MQTTClient(self.name, self.stm_driver)
+        self.player = Player(self.stm_driver)
+        self.recorder = Recorder(self.stm_driver)
         
 
     def setRecipient(self):
@@ -66,8 +68,9 @@ class HospiTalkie:
 
     def display(self, text):
         import threading
-        print("thread: ")
-        print(threading.current_thread())
+        print("displaying: " + text)
+        #print("thread: ")
+        #print(threading.current_thread())
         if text == "Contacts":
 
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("choose_reciever"))
@@ -95,11 +98,19 @@ class HospiTalkie:
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("saved_messages"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("saved_messages"))
         elif text == "reply_message":
-            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("reply_message"))
-            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("reply_messaged"))
+            print("Current recipient: " + str(self.currentRecipient))
+
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("reply"))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("reply_message", str(self.currentRecipient)))
+        elif text == "recording":
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("recording"))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("recording"))
         elif text == "done_recording":
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("done_recording"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("done_recording"))
+        elif text == "playing":
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("playing"))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("playing_from", str(self.currentRecipient)))
 
     def mute(self):
         print("mute")
@@ -131,17 +142,22 @@ class HospiTalkie:
 
     def storeMessages(self):
         print("Store message")
+        #TODO: store messages to be played later!!!
+    
+    def playNotification(self):
+        print("Playing notification")
+        self.stm_driver.send("start", "player", args=['notification.wav', False]) 
 
     def playMessage(self):
         print("Play message")
-        self.player = Player(self.stm_driver)
-        self.stm_driver.send("start", "player", args=[self.message]) #Getting error because of playing in-memory bufferr....
+        
+        #TODO: uncomment line below
+        self.stm_driver.send("start", "player", args=[self.message, True])
+        
         # TODO: find a way to detect if json.... if just text and not audio..
         #self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", self.message)
 
     def startRecording(self):
-        print("Create recorder")
-        self.recorder = Recorder(self.stm_driver)
         print("Start Recording")
         self.stm_driver.send('start', 'recorder')
 

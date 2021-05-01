@@ -19,7 +19,6 @@ class Recorder:
         self.channels = 1
         self.fs = 44100  # Record at 44100 samples per second
         self.filename = "output.wav"
-        self.p = pyaudio.PyAudio() 
         
         self._logger = logging.getLogger(__name__)
 
@@ -28,14 +27,16 @@ class Recorder:
         t2 = {'trigger': 'done', 'source': 'recording', 'target': 'processing'}
         t3 = {'trigger': 'done', 'source': 'processing', 'target': 'ready'}
 
-        s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()"}
-        s_processing = {'name': 'processing', 'do': 'process()'}
+        s_recording = {'name': 'recording', 'do': 'record()', "stop": "stop()", 'start': 'defer'}
+        s_processing = {'name': 'processing', 'do': 'process()', 'start': 'defer'}
 
         self.stm = Machine(name="recorder", transitions=[t0, t1, t2, t3], states=[s_recording, s_processing], obj=self)
         self.stm_driver.add_machine(self.stm)
 
     def record(self):
         print("recording...")
+        self.p = pyaudio.PyAudio() 
+
         stream = self.p.open(format=self.sample_format,
                 channels=self.channels,
                 rate=self.fs,
@@ -71,8 +72,9 @@ class Recorder:
         wf.writeframes(b''.join(self.frames))
         wf.close()
         print("done processing")
-        #content = b''.join(self.frames)
-        content = writer_file.getvalue()
+
+        content = writer_file.getvalue() # TODO: remember to change this back!!
+        #content = "Audio data here"
         self.stm_driver.send("recordingFinished", "HospiTalkie", args=[content])
         print("recording sent")
     

@@ -6,7 +6,8 @@ strings = dict(
     new_messages_description = "You got a new message, would you like to read/hear?",
     main_screen = "Welcome, press go btn to enter contacts, or back btn to enter messages",
     saved_messages = "Saved Messages",
-    reply_message = "Press go btn to reply back to idle",
+    reply = "Reply",
+    reply_message = "Press Go btn to reply to {}, or Back to idle",
     new_message = "Du har en melding. Vil du lese?",
     wrong_user_pass = "Wrong Username or Password",
     retype_user_pass = "Please type your username or password again",
@@ -20,7 +21,10 @@ strings = dict(
     not_disturbed = "You will not be disturbed!",
     record_message = "Record Message",
     idle = "Idle",
+    recording = "Recording message... Press Go to stop.",
     done_recording = "Done recording",
+    playing = "Playing",
+    playing_from = "Playing {}'s message",
     choose_reciever = "Choose Reciever",
 )
 
