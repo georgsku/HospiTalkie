@@ -5,17 +5,19 @@ Semester project for TTM4115 at NTNU.
 
 
 Collaboration between:
+```
 Julie Hjelle Dahl
 Anjan Sarker
 Georg Skuggedal
 André Storhaug
 Trond Vatten
+```
 
 
 
 ## Requirements
-### Client
-```
-Install pyaudio
-Install appJar
-```
+The following python packages needs to be installed.
+* pyaudio
+* appJar
+* stmpy
+* paho-mqtt
