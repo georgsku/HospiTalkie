@@ -76,9 +76,9 @@ t_startRecording_idle = {'trigger':'backBtnPressed',
 transitions.append(t_startRecording_idle)
 
 t_recording_doneRecording = {'trigger':'goBtnPressed',
-                           'source':'recording',
-                           'target':'doneRecording',
-                           'effect':'stopRecording'} 
+                            'source':'recording',
+                            'target':'doneRecording',
+                            'effect':'stopRecording'} 
 transitions.append(t_recording_doneRecording)
 
 t_recording_sendMessage = {'trigger':'recordingFinished',
@@ -101,28 +101,32 @@ transitions.append(t_recording_idle_t)
 
 #Transitions - Message Received
 t_idle_newMessage = {'trigger':'messageReceived',
-                       'source':'idle',
-                       'target':'newMessage',
-                        'effect': 'getMessage(*)'}
+                     'source':'idle',
+                     'target':'newMessage',
+                     'effect': 'getMessage(*)'}
 transitions.append(t_idle_newMessage)
 
 #TODO: stop playing in the player state machine by setting variable
-t_newMessage_idle = {'trigger':'backBtnPressed',
-                       'source':'newMessage',
-                       'target':'idle',
-                       'effect': 'storeMessages()'}
-transitions.append(t_newMessage_idle)
 
-t_newMessage_playMessage = {'trigger':'playingFinished',
-                               'source':'newMessage',
-                               'target':'playMessage'}
-transitions.append(t_newMessage_playMessage)
+t_newMessage_playOrStore = {'trigger':'playingFinished',
+                            'source':'newMessage',
+                            'target':'playOrStore'}
+transitions.append(t_newMessage_playOrStore)
 
+t_playOrStore_idle = {'trigger':'backBtnPressed',
+                      'source':'playOrStore',
+                      'target':'idle',
+                      'effect': 'storeMessages()'}
+transitions.append(t_playOrStore_idle)
 
+t_playOrStore_playMessage = {'trigger':'goBtnPressed',
+                             'source':'playOrStore',
+                             'target':'playMessage'}
+transitions.append(t_playOrStore_playMessage)
 
 t_playMessage_reply = {'trigger':'playingFinished',
-                        'source':'playMessage',
-                        'target':'reply'}
+                       'source':'playMessage',
+                       'target':'reply'}
 transitions.append(t_playMessage_reply)
 
 t_reply_idle = {'trigger':'backBtnPressed',
@@ -131,8 +135,8 @@ t_reply_idle = {'trigger':'backBtnPressed',
 transitions.append(t_reply_idle)                   
 
 t_reply_recording = {'trigger':'goBtnPressed',
-                          'source':'reply',
-                          'target':'recording'}
+                     'source':'reply',
+                     'target':'recording'}
 transitions.append(t_reply_recording)
 
 #Transitions - Saved Message
@@ -148,10 +152,15 @@ t_savedMessages_savedMessages = {'trigger':'scrollBtnScrolled',
                                  'effect': 'highlightNextMessage()'}
 transitions.append(t_savedMessages_savedMessages)
 
+t_savedMessages_playMessage = {'trigger':'goBtnPressed',
+                                 'source':'savedMessages',
+                                 'target':'playMessage'}
+transitions.append(t_savedMessages_playMessage)
+
 
 t_savedMessages_playMessage = {'trigger':'backBtnPressed',
-                                'source':'savedMessages',
-                                'target':'idle'}
+                               'source':'savedMessages',
+                               'target':'idle'}
 transitions.append(t_savedMessages_playMessage)
 
 
@@ -214,6 +223,11 @@ newMessage = {'name': 'newMessage',
               'entry': 'playNotification()',
               'messageReceived': 'defer'}
 states.append(newMessage)
+
+playOrStore = {'name': 'playOrStore',
+               'entry': 'display("play_or_store")',
+               'messageReceived': 'defer'}
+states.append(playOrStore)
 
 playMessage = {'name': 'playMessage',
                'entry': 'playMessage; display("playing")',

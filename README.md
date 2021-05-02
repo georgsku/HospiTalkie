@@ -5,7 +5,7 @@ Semester project for TTM4115 at NTNU.
 
 
 Collaboration between:
-sJulie Hjelle Dahl
+Julie Hjelle Dahl
 Anjan Sarker
 Georg Skuggedal
 André Storhaug

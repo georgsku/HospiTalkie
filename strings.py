@@ -2,13 +2,14 @@ strings = dict(
     hospi_talkie = "HospiTalkie",
     contacts="{}",
     btn_record = "Press Go to record a message",
+    new_message = "New Message",
     new_messages = "New Messages",
     new_messages_description = "You got a new message, would you like to read/hear?",
+    play_or_store = "You got a new message, would you like to hear?",
     main_screen = "Welcome, press go btn to enter contacts, or back btn to enter messages",
     saved_messages = "Saved Messages",
     reply = "Reply",
     reply_message = "Press Go btn to reply to {}, or Back to idle",
-    new_message = "Du har en melding. Vil du lese?",
     wrong_user_pass = "Wrong Username or Password",
     retype_user_pass = "Please type your username or password again",
     btn_go = "Go",
@@ -26,6 +27,7 @@ strings = dict(
     playing = "Playing",
     playing_from = "Playing {}'s message",
     choose_reciever = "Choose Reciever",
+    next_message = "Messages"
 )
 
 def get_string(string, *args):

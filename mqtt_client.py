@@ -1,10 +1,11 @@
 import paho.mqtt.client as mqtt
 import json
+from base64 import b64encode, b64decode
 
 MQTT_BROKER = '78.156.8.124'
 MQTT_PORT = 1883
 
-MQTT_TOPIC_HOSPITALKIE = 'hospitalkie'
+MQTT_TOPIC_HOSPITALKIE = 'hospitalkie/'
 MQTT_TOPIC_INPUT = 'input'
 MQTT_PHONEBOOK = 'phonebook/'
 MQTT_STATUS = 'status/'
@@ -26,30 +27,27 @@ class MQTTClient:
         self.mqtt_client.on_message = self.on_message
         self.mqtt_client.on_connect = self.on_connect
         self.mqtt_client.on_disconnect = self.on_disconnect
-    
-        # Set will
-        self.mqtt_client.will_set(MQTT_STATUS,0, qos=0, retain=True) 
 
     def start_client(self, usr, pwd):
-        print(usr)
-        print(pwd)
+        self.name = "ola"
+        self.mqtt_client.will_set(MQTT_STATUS + self.name, 0, qos=0, retain=True) 
         # Connect to the broker
-        self.mqtt_client.username_pw_set(username=usr, password=pwd)
+        self.mqtt_client.username_pw_set(username="ola", password="123")
         self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
-
+        self.mqtt_client.user_data_set(self.name)
         # Subscribe to own topic
-        self.ownTopic = MQTT_TOPIC_HOSPITALKIE + '/' + self.name
+        self.ownTopic = MQTT_TOPIC_HOSPITALKIE +  self.name
         self.mqtt_client.subscribe(self.ownTopic)
         self.mqtt_client.subscribe("teamtree/" + self.name)
         self.mqtt_client.subscribe("phonebook/" + self.name)
-        
         # start the internal loop to process MQTT messages
         self.mqtt_client.loop_start()
 
 
     def on_message(self, client, userdata, msg):
         print("Got a new message")
-        if msg.topic == MQTT_PHONEBOOK + self.name:
+        print(userdata)
+        if msg.topic == MQTT_PHONEBOOK +self.name:
             try:
                 message = msg.payload.decode("utf-8")
                 message = message.replace("\'", "\"")
@@ -58,11 +56,11 @@ class MQTTClient:
             except:
                 print("wops")
         else:
-            #message = str(msg.payload.decode("utf-8"))
-            message = msg.payload #Audio in binary
-            print("OMG IT WORKS")
-            self.stm_driver.send("messageReceived", "HospiTalkie", args=[message])
-            #TODO: Need to know who the sender was.....
+            data = json.loads(msg.payload)
+            sender = data["name"]
+            message = b64decode(data["audioMessage"].encode("utf-8"))
+
+            self.stm_driver.send("messageReceived", "HospiTalkie", args=[message, sender])
 
 
     def on_connect(self, client, userdata, flags, rc):
@@ -71,16 +69,21 @@ class MQTTClient:
             self.stm_driver.send("loginSuccess", "HospiTalkie")
             client.publish(MQTT_STATUS + self.name, 1, qos=0, retain=True)
             client.publish(MQTT_PHONEBOOK + self.name, "getPhonebook", qos=0, retain=True)
-        elif rc == 4:
+        elif rc == 5:
             self.mqtt_client.loop_stop()
             self.stm_driver.send("loginError", "HospiTalkie")
 
 
     def publish(self, recipient, message):
-        reciever = MQTT_TOPIC_HOSPITALKIE + '/' + recipient
-        self.mqtt_client.publish(reciever, message)
+        reciever = MQTT_TOPIC_HOSPITALKIE + recipient
+        #message + b'$name$' + self.name.title().encode()
+        
+        jsonMessage = {
+            "name": self.name, 
+            "audioMessage": b64encode(message).decode("utf-8"),
+        }
+        data = json.dumps(jsonMessage)
+        self.mqtt_client.publish(reciever, data)
           
     def on_disconnect(self, client, userdata, flags):
         client.publish(MQTT_STATUS + self.name, 0, qos=0, retain=True)
-
-  

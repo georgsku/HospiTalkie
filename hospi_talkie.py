@@ -3,8 +3,13 @@ from login_gui import LoginGui
 from strings import get_string
 from audio.recorder import Recorder
 from audio.player import Player
+from audio.file_manager import FileManager
+import glob
+import re
+import datetime
+import time
 
-"""
+
 import logging
 debug_level = logging.DEBUG
 logger = logging.getLogger('stmpy')
@@ -14,7 +19,7 @@ ch.setLevel(debug_level)
 formatter = logging.Formatter('%(asctime)s - %(name)-12s - %(levelname)-8s - %(message)s')
 ch.setFormatter(formatter)
 logger.addHandler(ch)
-"""
+
 class HospiTalkie:
     """
     State Machine for a named HospiTalkie
@@ -25,29 +30,33 @@ class HospiTalkie:
     def start(self, stm_driver, login_gui):
         #TODO: get the name of the "person"
         print("init HospiTalkie")
-        self.name = "Andre2"
+        self.name = "Ola"
         self.stm_driver = stm_driver
         self.login_gui = login_gui
         self.mqtt_client = MQTTClient(self.name, self.stm_driver)
         self.player = Player(self.stm_driver)
         self.recorder = Recorder(self.stm_driver)
+        self.fileManager = FileManager(self.stm_driver)
+        self.messageCounter = 0
+        self.isBuffer = True
+        self.sender = None
         
 
     def setRecipient(self):
         print("setRecipient HospiTalkie")
         #maybe need to convert topic from json if not done in GUI
         self.currentRecipient = self.mqtt_client.selected_recipient
-        self.currentRecipientTopic = self.mqtt_client.phonebook[self.currentRecipient]
+        self.currentRecipientTopic = self.mqtt_client.phonebook[self.currentRecipient.title()].lower()
+        print(self.currentRecipient, self.currentRecipientTopic)
 
     def sendMessage(self, message):
         print("sendMessage HospiTalkie")
         
         #TODO: Check this!! the audio data cant be json encoded.... but we still need the sender
         #msg = json.dumps({"message": message, "from": name}) 
-        
-        print("message")
         print(len(message))
-        self.mqtt_client.publish(self.currentRecipient, message)
+        print("Sending message to:" , self.currentRecipientTopic)
+        self.mqtt_client.publish(self.currentRecipientTopic, message)
         self.stm_driver.send("messagePublished", "HospiTalkie") # TODO: Use callback instead then send??
 
     def authenticate(self, usr, pwd):
@@ -72,7 +81,6 @@ class HospiTalkie:
         #print("thread: ")
         #print(threading.current_thread())
         if text == "Contacts":
-
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("choose_reciever"))
             prevContact = list(self.mqtt_client.phonebook.keys())[(self.mqtt_client.phonebook_counter - 1) % len(self.mqtt_client.phonebook)]
             self.mqtt_client.selected_recipient = list(self.mqtt_client.phonebook.keys())[self.mqtt_client.phonebook_counter % len(self.mqtt_client.phonebook)]
@@ -81,27 +89,33 @@ class HospiTalkie:
             contact = prevContact+ "\n" + "--> " + self.mqtt_client.selected_recipient + "\n" + nextContact
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", ""+contact+"")
         elif text == "next_contact":
-            print("heo")
             self.mqtt_client.phonebook_counter += 1
         elif text == "btn_record":
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("record_message"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("btn_record"))
         elif text == "main_screen":
-
             print("main screen")
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("idle"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("main_screen"))
+            self.login_gui.app.setLabel("title", "Welcome To HospiTalkie " + self.mqtt_client.name.title())
         elif text == "new_messages":
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("new_message"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("new_messages_description"))
         elif text == "saved_messages":
+            self.isBuffer = False
+            self.messages = glob.glob("./Messages/*.wav")
+            self.message = self.messages[self.messageCounter % len(self.messages)]
+            self.currentRecipient = self.message[self.message.rfind("/"):][1:].split("-")[0]
+            self.currentRecipientTopic = self.mqtt_client.phonebook[self.currentRecipient]
+            self.messageDisplay = re.search('./Messages/(.*).wav', self.message).group(1)
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("saved_messages"))
-            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("saved_messages"))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("saved_messages") + "\n" + self.messageDisplay)
+
         elif text == "reply_message":
-            print("Current recipient: " + str(self.currentRecipient))
+            print("Current recipient: " + str(self.sender))
 
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("reply"))
-            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("reply_message", str(self.currentRecipient)))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("reply_message", str(self.sender)))
         elif text == "recording":
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("recording"))
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("recording"))
@@ -110,7 +124,14 @@ class HospiTalkie:
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("done_recording"))
         elif text == "playing":
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("playing"))
-            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("playing_from", str(self.currentRecipient)))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("playing_from", str(self.sender)))
+        elif text == "play_or_store":
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("new_message"))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("play_or_store"))
+        elif text == "next_message":
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("next_message"))
+            #TODO display name of message
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", "message here!")
 
     def mute(self):
         print("mute")
@@ -125,24 +146,29 @@ class HospiTalkie:
 
     def highlightNextMessage(self):
         print("highlightNextMessage")
-        
-    def storeMessage(self):
-        print("storeMessage")
+        self.messageCounter += 1  
 
-        #TODO: finish audiomanager for saving and deleting files...
-        #Can we just keep everything in memory??? => Easy...
-        #audiomanager = AudioManager(self.stm_driver)
-        #self.stm_driver.send("save", "AudioManager")
-
-    def getMessage(self, message):
+    def getMessage(self, message, sender):
         print("Get Message")
+        self.isBuffer = True
+        self.sender = sender  #This makes audio message available in "playMessage".
         self.message = message  #This makes audio message available in "playMessage".
         # TODO: save or keep voiceee message in memory?
         
 
     def storeMessages(self):
+        ts = time.time()
+        st = datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S')
         print("Store message")
+        filename = self.sender.title() + "-" + st
+        data = self.message
+        self.stm_driver.send("saveFile", "fileManager", args=[filename, data]) 
+        
         #TODO: store messages to be played later!!!
+
+    def deleteMessages(self):
+        print("delete message")
+        
     
     def playNotification(self):
         print("Playing notification")
@@ -152,7 +178,7 @@ class HospiTalkie:
         print("Play message")
         
         #TODO: uncomment line below
-        self.stm_driver.send("start", "player", args=[self.message, True])
+        self.stm_driver.send("start", "player", args=[self.message, self.isBuffer])
         
         # TODO: find a way to detect if json.... if just text and not audio..
         #self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", self.message)

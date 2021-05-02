@@ -1,5 +1,4 @@
 from appJar import gui
-from gui_manager import GuiManager
 from strings import get_string
 class LoginGui:
   
