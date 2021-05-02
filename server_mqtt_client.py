@@ -20,7 +20,7 @@ class serverMQTTClient:
         #callback methods
         self.client.on_message = self.on_message
         
-        self.client.username_pw_set(username="ola", password="123")
+        self.client.username_pw_set(username="server", password="server")
 
         # Connect to the broker
         self.client.connect(MQTT_BROKER, MQTT_PORT)

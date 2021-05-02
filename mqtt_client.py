@@ -16,7 +16,7 @@ class MQTTClient:
         print("init MqttClient")
         self.name = name
         self.stm_driver = stm_driver
-        self.phonebook = {"George": "george", "Julie": "Julie", "Trond": "Trond", "Anjan": "Anjan"}
+        self.phonebook = {}
         self.phonebook_counter = 0
         self.selected_recipient = None
 
@@ -29,10 +29,10 @@ class MQTTClient:
         self.mqtt_client.on_disconnect = self.on_disconnect
 
     def start_client(self, usr, pwd):
-        self.name = "ola"
+        self.name = usr
         self.mqtt_client.will_set(MQTT_STATUS + self.name, 0, qos=0, retain=True) 
         # Connect to the broker
-        self.mqtt_client.username_pw_set(username="ola", password="123")
+        self.mqtt_client.username_pw_set(username=usr, password=pwd)
         self.mqtt_client.connect(MQTT_BROKER, MQTT_PORT)
         self.mqtt_client.user_data_set(self.name)
         # Subscribe to own topic
@@ -70,8 +70,8 @@ class MQTTClient:
             self.stm_driver.send("loginSuccess", "HospiTalkie")
             client.publish(MQTT_STATUS + self.name, 1, qos=0, retain=True)
             client.publish(MQTT_PHONEBOOK + self.name, "getPhonebook", qos=0, retain=True)
+            print("HEr we are")
         elif rc == 5:
-            self.mqtt_client.loop_stop()
             self.stm_driver.send("loginError", "HospiTalkie")
 
 

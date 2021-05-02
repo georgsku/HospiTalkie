@@ -15,7 +15,7 @@ t_initial_login = {'source': 'initial',
                    'target': 'login',}
 transitions.append(t_initial_login)
 
-t_login_authorize = {'trigger': 'error',
+t_login_authorize = {'trigger': 'loginError',
                      'source': 'login',
                      'target': 'login',
                      'effect': 'loginError'}
@@ -155,8 +155,8 @@ t_savedMessages_savedMessages = {'trigger':'scrollBtnScrolled',
 transitions.append(t_savedMessages_savedMessages)
 
 t_savedMessages_playMessage = {'trigger':'goBtnPressed',
-                                 'source':'savedMessages',
-                                 'target':'playMessage'}
+                               'source':'savedMessages',
+                               'target':'playMessage'}
 transitions.append(t_savedMessages_playMessage)
 
 

@@ -20,6 +20,8 @@ class LoginGui:
     self.app.getLabelWidget("title").config(font=("Sans Serif", "24", "bold"))
     self.app.stopFrame()
 
+
+    self.app.addMessage("message", "Type in your username and password")
     self.app.addLabelEntry("Username")
     self.app.addLabelSecretEntry("Password")
     self.app.addButtons(["Submit", "Cancel"], self.press)
@@ -53,6 +55,7 @@ class LoginGui:
     self.app.removeButton("Submit")
     self.app.removeButton("Cancel")
     self.app.removeLabel("title")
+    self.app.removeMessage("message")
 
     self.app.setSize("300x300")
     self.app.setStretch("both")
@@ -94,7 +97,7 @@ class LoginGui:
 
   def login_error(self):
     print("login error")
-    self.app.infoBox(get_string("wrong_user_pass"), get_string("retype_user_pass"), parent=None)
+    self.app.setMessage("message", "Wrong username or password. Please try again.")
 
   def message_received(self, message):
     print("hei og ho")

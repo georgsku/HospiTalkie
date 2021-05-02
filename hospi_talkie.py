@@ -10,7 +10,7 @@ import datetime
 import time
 
 
-import logging
+""" import logging
 debug_level = logging.DEBUG
 logger = logging.getLogger('stmpy')
 logger.setLevel(debug_level)
@@ -18,7 +18,7 @@ ch = logging.StreamHandler()
 ch.setLevel(debug_level)
 formatter = logging.Formatter('%(asctime)s - %(name)-12s - %(levelname)-8s - %(message)s')
 ch.setFormatter(formatter)
-logger.addHandler(ch)
+logger.addHandler(ch) """
 
 class HospiTalkie:
     """
@@ -156,7 +156,7 @@ class HospiTalkie:
         self.isBuffer = True
         self.sender = sender  #This makes audio message available in "playMessage".
         self.message = message  #This makes audio message available in "playMessage".
-        # TODO: save or keep voiceee message in memory?
+        self.currentRecipientTopic = self.mqtt_client.phonebook[self.sender.title()]
         
 
     def storeMessages(self):
