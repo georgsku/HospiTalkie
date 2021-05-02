@@ -77,8 +77,6 @@ class MQTTClient:
 
     def publish(self, recipient, message):
         reciever = MQTT_TOPIC_HOSPITALKIE + recipient
-        #message + b'$name$' + self.name.title().encode()
-        
         jsonMessage = {
             "name": self.name, 
             "audioMessage": b64encode(message).decode("utf-8"),
