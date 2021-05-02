@@ -17,4 +17,5 @@ Trond Vatten
 ### Client
 ```
 Install pyaudio
+Install appJar
 ```
