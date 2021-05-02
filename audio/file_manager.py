@@ -34,10 +34,10 @@ class FileManager:
         f.write(data)
         f.close()
 
-    def delete(self, fileName):
+    def delete(self, path):
         #todo: delete unused files.
         print("Deleting file...")
-        if os.path.exists("./Messages/" + fileName):
-            os.remove("./Messages/" + fileName)
+        if os.path.exists(path):
+            os.remove(path)
         else:
             print("The file does not exist")

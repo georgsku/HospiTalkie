@@ -9,10 +9,7 @@ MQTT_TOPIC_HOSPITALKIE = 'hospitalkie/'
 MQTT_STATUS = 'status/'
 MQTT_PHONEBOOK = 'phonebook/'
 
-phonebook = {"All": "", "George": "george", "Julie": "Julie", "Trond": "Trond", "Anjan": "Anjan"}
-
-
-
+phonebook = {"All": "broadcast", "George": "george", "Julie": "Julie", "Trond": "Trond", "Anjan": "Anjan"}
 
 class serverMQTTClient:
     """Manages all MQTT functionallity"""

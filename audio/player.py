@@ -24,7 +24,7 @@ class Player:
         self.stm_driver.add_machine(self.stm)
 
 
-    def play(self, audio, isBuffer=False):
+    def play(self, audio, isBuffer=False, delete=False):
         #filename = 'output.wav'
         print("playing...")
         
@@ -65,3 +65,6 @@ class Player:
         p.terminate()
         self.stm_driver.send("playingFinished", "HospiTalkie")
         print("\n Playing finished \n")
+
+        if (delete and not isBuffer):
+            self.stm_driver.send("deleteFile", "fileManager", args=[file])

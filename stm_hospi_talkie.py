@@ -1,5 +1,6 @@
 from stmpy import Machine, Driver
 
+
 ##########################################
 #    Transitions
 ##########################################
@@ -124,6 +125,7 @@ t_playOrStore_playMessage = {'trigger':'goBtnPressed',
                              'target':'playMessage'}
 transitions.append(t_playOrStore_playMessage)
 
+# TODO: Compound transition
 t_playMessage_reply = {'trigger':'playingFinished',
                        'source':'playMessage',
                        'target':'reply'}

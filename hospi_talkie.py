@@ -132,6 +132,9 @@ class HospiTalkie:
             self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string("next_message"))
             #TODO display name of message
             self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", "message here!")
+        elif text == "delete_message":
+            self.login_gui.app.queueFunction(self.login_gui.app.setTitle, get_string(""))
+            self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", get_string("delete_message"))
 
     def mute(self):
         print("mute")
@@ -172,13 +175,13 @@ class HospiTalkie:
     
     def playNotification(self):
         print("Playing notification")
-        self.stm_driver.send("start", "player", args=['notification.wav', False]) 
+        self.stm_driver.send("start", "player", args=['notification.wav', False, False]) 
 
     def playMessage(self):
         print("Play message")
         
         #TODO: uncomment line below
-        self.stm_driver.send("start", "player", args=[self.message, self.isBuffer])
+        self.stm_driver.send("start", "player", args=[self.message, self.isBuffer, True])
         
         # TODO: find a way to detect if json.... if just text and not audio..
         #self.login_gui.app.queueFunction(self.login_gui.app.setMessage, "mess", self.message)

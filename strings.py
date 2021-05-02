@@ -27,7 +27,8 @@ strings = dict(
     playing = "Playing",
     playing_from = "Playing {}'s message",
     choose_reciever = "Choose Reciever",
-    next_message = "Messages"
+    next_message = "Messages",
+    delete_message = "Do you want to delete the recorded message?",
 )
 
 def get_string(string, *args):

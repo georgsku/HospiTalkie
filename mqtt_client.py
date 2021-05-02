@@ -40,6 +40,7 @@ class MQTTClient:
         self.mqtt_client.subscribe(self.ownTopic)
         self.mqtt_client.subscribe("teamtree/" + self.name)
         self.mqtt_client.subscribe("phonebook/" + self.name)
+        self.mqtt_client.subscribe(MQTT_TOPIC_HOSPITALKIE  + "broadcast")
         # start the internal loop to process MQTT messages
         self.mqtt_client.loop_start()
 
